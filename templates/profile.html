@@ -13,11 +13,29 @@
 <body>
     <h3>Welcome, {{userInfo['first_name']}} {{userInfo['last_name']}}!</h3>
     <ul>
-    <li>To create a new decks and cards or study the ones you have created, please go to "Library".</li>
-    <li>You can always search for other decks in "Search" page an add them to your library.</li>
-
-    <li>You can click the buttons below to update your account information or delete it.</li>
+        <li>To create a new decks and cards or study the ones you have created, please go to "Library".</li>
+        <li>You can always search for other decks in "Search" page and add them to your library.</li>
     </ul>
+<br>
+
+    <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">Languages You've Practiced</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr>
+            {% for language in lang_list %}
+            <td>{{language}}</td>
+          </tr>
+          {% endfor %}
+ 
+        </tbody>
+      </table>
+    <h4>If you want to update your account information or delete it, you can click the buttons below.</h4>
+    <br>
     <form action="/profile" method="POST" >
         <div class="form-group">
             <button type="submit" name="update" value = "{{userInfo['id']}}" class="btn btn-success">Update Account</button>
