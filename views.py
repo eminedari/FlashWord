@@ -42,8 +42,15 @@ def update_account(id):
 def profile():
     if request.method=="GET" :
         user_id = session["user_id"]
+        spoken_lang = select("lang_id","spoken_languages","user_id='{}'".format(user_id))
+       
+        lang_list=[]
+        for lang in spoken_lang:
+            lang_name=  select("name","languages","id='{}'".format(lang[0]))  
+            lang_list.append(lang_name[0][0])
+
         userInfo= select("id,username,password,first_name,last_name,contact","users","id='{}'".format(user_id),asDict=True)
-        return render_template("profile.html",userInfo=userInfo)
+        return render_template("profile.html",userInfo=userInfo,lang_list=lang_list)
     if request.method=="POST" :
         if "delete" in request.form:
             delete("users","id='{}'".format(request.form.get("delete")))
@@ -57,12 +64,15 @@ def library():
     if request.method=='GET':
         user_id= session['user_id']
         #get decks belonging to the user logined
-        myDecks = select("id,title,front_lang,back_lang,quiz_score","decks","owning_user='{}'".format(user_id),asDict=True)
+        myDecks = select("id,title,front_lang,back_lang,quiz_score,card_count","decks","owning_user='{}'".format(user_id),asDict=True)
+        ownedCount= select("count(*)","decks","owning_user='{}'".format(user_id))
         #get the decks user have added
-        addedDecks = select("decks.id,decks.title,decks.front_lang,decks.back_lang,decks.quiz_score",
+        addedDecks = select("decks.id,decks.title,decks.front_lang,decks.back_lang,decks.quiz_score,decks.card_count",
         "decks join shared_decks on decks.id=shared_decks.deck_id",
         "shared_decks.user_id='{}'".format(user_id),asDict=True)
-        return render_template("library.html",myDecks=myDecks,addedDecks=addedDecks,isMyDict=isinstance(myDecks,dict),isAddedDict=isinstance(addedDecks,dict))
+        addedCount = select("count(*)","shared_decks","user_id='{}'".format(user_id))
+        return render_template("library.html",myDecks=myDecks,addedDecks=addedDecks,isMyDict=isinstance(myDecks,dict),
+        isAddedDict=isinstance(addedDecks,dict),ownedCount=ownedCount[0][0],addedCount=addedCount[0][0])
     else:
         return redirect(url_for('main.create_deck'))
    
@@ -70,7 +80,6 @@ def library():
 
 @main.route("/deck/<id>")
 def deck_detail(id):
-    #should show flashcards actually
     cards = select("id,front,back,belonging_deck","flashcards","belonging_deck='{}'".format(id),asDict=True)
     return render_template("deck_detail.html",cards=cards,isDict=isinstance(cards,dict),deck_id=id)
 
@@ -139,7 +148,7 @@ def create_deck():
 
 
         #create the deck with the inputs from user
-        #quiz default 0 sonradan ekledim dikkat
+        
         deck_id = insert(table="decks",columns="title,front_lang,back_lang,privacy,owning_user",
         values="'{}','{}','{}','{}','{}'".format(title,fl,bl,privacy,user_id))
 
@@ -218,26 +227,35 @@ def add_card(deck_id):
 @main.route('/search',methods=['GET','POST'])
 def search():
     decks=None
+    user_id = session['user_id']
     keywords = select("id,keyword","keywords",asDict=True)
     if request.method == 'GET':
-        return render_template("search.html",keywords=keywords,decks=decks, isDict=True)
+        return render_template("search.html",keywords=keywords,decks=decks, isDict=True,user_id=user_id)
     else:
         key_id= request.form.get('key')
-
-        decks =select("decks.id,decks.title,decks.front_lang,decks.back_lang,decks.card_count,decks.privacy",
+        
+        decks =select("decks.id,decks.title,decks.front_lang,decks.back_lang,decks.card_count,decks.privacy,decks.owning_user",
         "decks join deck_keyword on decks.id=deck_keyword.deck_id",
-        "deck_keyword.keyword_id='{}'".format(key_id),asDict=True)
+        "deck_keyword.keyword_id='{}' and decks.privacy='False'".format(key_id),asDict=True)
         print(decks)
-        return render_template("search.html", keywords=keywords, decks=decks,isDict=isinstance(decks,dict))
+        print("user_id=",user_id)
+        return render_template("search.html", keywords=keywords, decks=decks,isDict=isinstance(decks,dict),user_id=user_id)
 
 
 @main.route('/add_shared/<deck_id>')
 def add_shared(deck_id):
     user_id= session["user_id"]
     #add the deck to shared_decks table
-    insert("shared_decks","user_id,deck_id","'{}','{}'".format(user_id,deck_id),returnID=False)
-    #return back to library
-    return redirect(url_for('main.library'))
+    owner = select("owning_user","decks","id='{}'".format(deck_id))
+    print(owner[0][0])
+    if owner[0][0]==user_id:
+        flash("This deck is created by you.")
+        return redirect(url_for('main.search'))
+
+    else:
+        insert("shared_decks","user_id,deck_id","'{}','{}'".format(user_id,deck_id),returnID=False)
+        #return back to library
+        return redirect(url_for('main.library'))
 
 @auth.route('/login', methods=['GET'])
 def login():
