@@ -1,0 +1,23 @@
+{% extends "layout_main.html" %}
+{% block title%} Quiz {%endblock %}
+ 
+{% block content %}
+<div style="margin:1em;">
+<h3>Please answer carefully to get a good score!</h3>
+<form method="POST" action="{{url_for('main.quiz',deck_id=deck_id)}}">
+    {% for card in cards %} 
+        <label for="front">Front of the card</label><br>
+        <input type="text" class="form-control" id="front"  value="{{card[0]}}" >
+        
+        
+        <input type="text" class="form-control"  name="{{card[0]}}"  id="{{card[0]}}"  placeholder="Your answer" >
+        
+        <br>
+    {% endfor %}
+
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Send Answers</button>
+      </div>
+</form>
+</div>
+{%endblock %}

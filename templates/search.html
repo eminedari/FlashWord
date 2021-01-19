@@ -1,0 +1,56 @@
+{% extends "layout_main.html" %}
+{% block title%} Search {%endblock %}
+ 
+{% block content %}
+<div style="margin:1em;">
+  <form method="post" action="/search">
+    <h4>Pick a keyword, and find related decks!</h4>
+    <br>
+    <div class="row">
+      <div style="margin-left: 1em;" class="dropdown">
+        <select class="custom-select" id="key" name="key">
+          <option selected>Pick a keyword</option>
+          {% for keyword in keywords %}
+          <option value="{{keyword['id']}}">{{keyword['keyword']}}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+    </div>
+    <br>
+      <button type="submit" class="btn btn-success">Search</button>
+  </form>
+  <br>
+  <h5>You can add a deck to your library by clicking  its title!</h5>
+  <br>
+{% if decks %}
+<ul class="list-group">
+    {% if isDict %}
+      {% if  not decks[decks.privacy]%}
+      <li class="list-group-item list-group-item-success"> <a href=" {{ url_for('main.add_shared', deck_id= decks['decks.id'] ) }}">{{decks['decks.title']}}</a> </li>
+      <li class="list-group-item">Front Language:{{decks['decks.front_lang']}} </li>
+      <li class="list-group-item">Back Language:{{decks['decks.back_lang']}} </li>
+      <li class="list-group-item">Card Count:{{decks['decks.card_count']}} </li>
+      <br>
+      {% endif %}
+
+    {% else %}
+
+      {% for deck in decks %}
+        {% if not  deck[deck.privacy] %}
+        <li class="list-group-item list-group-item-success"> <a href=" {{ url_for('main.add_shared', deck_id= deck['decks.id'] ) }}">{{deck['decks.title']}}</a> </li>
+        <li class="list-group-item">Front Language:{{deck['decks.front_lang']}} </li>
+        <li class="list-group-item">Back Language:{{deck['decks.back_lang']}} </li>
+        <li class="list-group-item">Card Count:{{deck['decks.card_count']}} </li>
+        <br>
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+</ul>
+{% else %}
+<p>Sorry, the deck with the searched keyword has been deleted.</p>
+{% endif %}
+
+</div>
+     
+{%endblock %}

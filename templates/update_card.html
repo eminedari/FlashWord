@@ -1,0 +1,24 @@
+{% extends "layout_main.html" %}
+{% block title%}Update Card {%endblock %}
+ 
+{% block content %}
+<div style="margin:1em;">
+<form method="POST" action="{{url_for('main.update_card',id=cardInfo['id'])}}">
+    <div class="form-group">
+      <label for="front">Front of the card</label><br>
+      <input type="text" class="form-control" name="front" id="front"  placeholder="Enter a word, phrase or anything you want to practice">
+    </div>
+    <div class="form-group">
+      <label for="back">Back of the card</label><br>
+      <input type="text"  class="form-control"  name="back" id="back" placeholder="Enter the explanation for the front side">
+    </div>
+    <div class="form-group">
+        <button type="submit" name="update"  class="btn btn-primary">Update the Card</button>
+    </div>
+</form>
+</div>
+
+{%endblock %}
+
+
+

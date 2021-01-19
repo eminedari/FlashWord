@@ -1,0 +1,52 @@
+{% extends "layout_main.html" %}
+{% block title%} Studying Deck {%endblock %}
+{% block content %}
+
+{% if isDict %}
+<div class="row">
+  <div class="column">
+    <div class="card text-center" style="width: 18rem;">
+      <div class="card-body">
+        <h5 class="card-title">{{cards['front']}}</h5>
+      </div>
+    </div>
+  </div>
+  <div class="column">
+    <div class="card text-center" style="width: 18rem;">
+      <div class="card-body">
+        <h5 class="card-title">{{cards['back']}}</h5>
+      </div>
+    </div>
+  </div>
+  <p ><a  href=" {{ url_for('main.delete_card', id= cards['id'])}}">Delete card</a></p>
+  <p> / </p>
+  <p ><a  href=" {{ url_for('main.update_card', id= cards['id'])}}">Update  card</a></p>
+</div>
+{% else %}
+
+  {% for card in cards %} 
+  <div class="row">
+    <div class="column">
+      <div class="card text-center" style="width: 18rem;">
+        <div class="card-body">
+          <h5 id="info" class="card-title">{{card['front']}}</h5>
+        </div>
+      </div>
+    </div>
+    <div class="column">
+      <div class="card text-center" style="width: 18rem;">
+        <div class="card-body">
+          <h5 id="info"class="card-title">{{card['back']}}</h5>
+        </div>
+      </div>
+    </div>
+    <p><a  href=" {{ url_for('main.delete_card',id= card['id'])}}">Delete card</a></p>
+    <p> / </p>
+    <p ><a  href=" {{ url_for('main.update_card', id= card['id'])}}">Update card</a></p>
+  </div>
+  {% endfor %}
+  <p ><a  href=" {{ url_for('main.quiz',deck_id=deck_id)}}">Take Quiz</a></p>
+{% endif %}
+
+{%endblock %}
+

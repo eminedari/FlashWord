@@ -1,0 +1,90 @@
+{% extends "layout_main.html" %}
+{% block title%}Library {%endblock %}
+ 
+{% block content %}
+<div style="margin:1em;">
+  <h3>Library</h3>
+  <p>Here are some guides to help you:</p>
+  <ul>
+    <li>Here you can view the decks you have created in "My Decks" table and the ones you have added will be in "Added Decks" table below it.</li>
+    <li>You can add new cards to the decks you have created by clicking the button or remove a deck completely.</li>
+    <li>You can view the cards by clicking the title of their deck, you also have an option delete cards when you are studying.</li>
+    <li>To take a quiz, you can click the underlined "Take a Quiz" text after viewing your flashcards, your score will be updated according to your answers.</li>
+    <li>The button below will enable you to create an empty deck and add it to the table, then you have to add your flashcards of your wish!</li>
+  </ul>  
+  
+  
+
+<form method="POST" action="/library">
+  <div class="form-group">
+    <button type="submit" class="btn btn-primary">Create Deck</button>
+  </div>
+</form>
+<br>
+<br>
+
+<table class="table">
+    <thead>
+      <tr>
+        <th scope="col">My Decks</th>
+        <th scope="col"></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% if isMyDict %}
+      <tr >
+        <td>Title: <a  href=" {{ url_for('main.deck_detail', id= myDecks['id']) }}">   {{ myDecks['title'] }} </a>, Score: {{ myDecks['quiz_score'] }} </td>
+        <td>
+          <form class="form-inline" action=" {{ url_for('main.add_card', deck_id= myDecks['id']) }}">
+            <button type="submit" class="btn btn-success" name="btn" value="{{myDecks['id']}}" style="margin-bottom: 1em;">Add New Card</button>
+        </form>
+        <form class="form-inline" action=" {{ url_for('main.delete_deck', id= myDecks['id']) }}">
+          <button type="submit" class="btn btn-danger"  name="btn"  value="{{myDecks['id']}}" >Remove Deck </button>
+        </form>
+      
+        </td>
+    </tr>
+
+      {% else %}
+      {% for deck in myDecks %}
+        <tr >
+            <td>Title: <a  href=" {{ url_for('main.deck_detail', id= deck['id']) }}">   {{ deck['title'] }} </a>, Score: {{ deck['quiz_score'] }}</td>
+            <td>
+              <form class="form-inline" action=" {{ url_for('main.add_card', deck_id= deck['id']) }}">
+                <button type="submit" class="btn btn-success" name="btn" value="{{deck['id']}}" style="margin-bottom: 1em;">Add New Card</button>
+            </form>
+            <form class="form-inline" action=" {{ url_for('main.delete_deck', id= deck['id']) }}">
+              <button type="submit" class="btn btn-danger"  name="btn"  value="{{deck['id']}}" >Remove Deck </button>
+            </form>
+          
+            </td>
+        </tr>
+        {% endfor %}
+        {% endif %}
+ 
+    </tbody>
+      </table>
+
+<table class="table">
+      <thead>
+        <tr>
+          <th scope="col">Added Decks</th>
+        </tr>
+      </thead>
+      <tbody> 
+        {% if isAddedDict %}
+        <tr>
+          <td>Title: <a href=" {{ url_for('main.deck_detail', id= addedDecks['decks.id'] ) }}"> {{ addedDecks['decks.title'] }} </a></td>
+      </tr>
+
+      {% else %}
+        {% for added in addedDecks %}
+        <tr>
+            <td>Title: <a href=" {{ url_for('main.deck_detail', id= added['decks.id'] ) }}"> {{ added['decks.title'] }} </a></td>
+        </tr>
+        {% endfor %}
+      {% endif %}
+      </tbody>
+</table>      
+  </div>
+{%endblock %}
