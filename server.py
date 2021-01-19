@@ -10,7 +10,7 @@ from views import main as main_blueprint
 extensions.register_type(extensions.UNICODE)
 extensions.register_type(extensions.UNICODEARRAY)
 
-heroku = False
+heroku = True
 
 if(not heroku): 
     os.environ['DATABASE_URL'] = "dbname='postgres' user='postgres' host='localhost' password='dbpassword'"
@@ -18,7 +18,7 @@ if(not heroku):
 
 
 app = Flask(__name__) 
-app.secret_key = "verySecretKey"
+app.config['SECRET_KEY'] = "verySecretKey"
 app.register_blueprint(auth_blueprint)
 app.register_blueprint(main_blueprint)
    
