@@ -1,8 +1,6 @@
 from flask import Flask,render_template, request,redirect,url_for,session,flash, Blueprint
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from flask_login import UserMixin,login_required, current_user
-
 from queries import select,insert,update,delete
 
 main = Blueprint('main',__name__)
